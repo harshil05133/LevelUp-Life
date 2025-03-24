@@ -1,0 +1,48 @@
+1. React: For building the user interface
+2. React Router: For handling routing in our React application
+3. Tailwind CSS: For stlying purposes
+4. Axios: For maing http requests to our APIs
+5. Vite: For building and serving our React application
+6. PostCSS: For processing CSS with plugins like Tailwind
+    - @tailwindcss/postcss - Tailwind's PostCSS plugin (newer version)
+    - Autoprefixer - PostCSS plugin to parse CSS and add vendor prefixes
+
+
+Backend Dependencies:
+1. Express
+2. Mongoose
+3. bcryptjs
+4. jsonwebtoken(jwt)
+5. cors
+6. dotenv
+
+Frontend Dependencies:
+1. React
+2. React DOM
+3. React Router DOM
+    - createBrowserRouter, RouterProvider, NavLink, Outlet, useNavigate, useState
+4. Axios
+
+Look into the package.json file to see all dependencies and scripts. 
+here are the extra stuff i downloaded
+
+"devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.0.0",
+    "postcss": "^8.0.0",
+    "vite": "^4.0.0"
+  }
+
+
+To start the backend:
+  - cd into the auth folder
+  - run node app.js
+  - available at http://localhost:5000
+
+(I normally split the terminal)
+
+To start the frontend:
+  - cd into the frontend folder
+  - run npm run dev
+  - available at http://localhost:5173 
