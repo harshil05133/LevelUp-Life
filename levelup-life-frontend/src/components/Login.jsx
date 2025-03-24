@@ -1,34 +1,50 @@
 import React, { useState } from 'react';
 import { login } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
+
+//useState is a hook that allows you to have state variables in functional components
+//useNavigate is a hook that allows you to navigate to different pages in your application
+
 
 const Login = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); //initialize the navigate function from the useNavigate hook
+  
+  //use state returns array with the current state value, and a function to update the state
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+
+  //states for error messages, tracking loading status during form submission, and state forthe remember me checkbox
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
+  //destructure the email and password from the formData object
   const { email, password } = formData;
 
+  //function to update the form data when the user types in the input fields
+  //e.target.name is the name attribute of the input field, e.target.value is the value entered by the user
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  //function to handle form submission
   const onSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
+    e.preventDefault(); //prevent a page reload
+    setError(''); //reset the previous error messages
+    setIsLoading(true); //set loading to true while the form is being submitted
     
+    //try to log in the user using the login function from the auth API
     try {
       const response = await login(formData);
       
       // Store token in localStorage or sessionStorage based on remember me
+      //local storage stays even after the browser is closed, session storage is cleared when the browser is closed
       const storage = rememberMe ? localStorage : sessionStorage;
-      storage.setItem('token', response.token);
+      storage.setItem('token', response.token); //store the jwt token in the selected storage
       
       // Redirect to dashboard after successful login
       navigate('/dashboard');
@@ -40,6 +56,7 @@ const Login = () => {
     }
   };
 
+  //return the login form for the user
   return (
     <div className="max-w-md mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Welcome Back</h2>
@@ -50,7 +67,10 @@ const Login = () => {
         </div>
       )}
       
+      {/* Login form with onSubmit handler */}
       <form onSubmit={onSubmit} className="space-y-4">
+        
+         {/* Email input field */}
         <div>
           <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
           <input
@@ -64,6 +84,7 @@ const Login = () => {
           />
         </div>
         
+        {/* Password input field */}
         <div>
           <label htmlFor="password" className="block text-gray-700 mb-2">Password</label>
           <input
@@ -77,7 +98,10 @@ const Login = () => {
           />
         </div>
         
+        {/* Remember me checkbox and forgot password link */}
         <div className="flex items-center justify-between">
+          
+          {/* Remember me checkbox */}
           <div className="flex items-center">
             <input
               id="remember-me"
@@ -91,6 +115,7 @@ const Login = () => {
             </label>
           </div>
           
+          {/* Forgot password link */}
           <div className="text-sm">
             <a href="/forgot-password" className="text-blue-600 hover:underline">
               Forgot your password?
@@ -98,6 +123,7 @@ const Login = () => {
           </div>
         </div>
         
+        {/* Login button with loading state */}
         <button
           type="submit"
           disabled={isLoading}
@@ -105,14 +131,17 @@ const Login = () => {
           to-green-600 hover:from-green-500 hover:to-green-700 transition duration-200 focus:outline-none focus:ring-2 
           focus:ring-green-500 focus:ring-opacity-50"
         >
+          {/* Button text changes based on loading state */}
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
         
+        {/* Sign up link */}
+        {/* Redirect to the register page if the user doesn't have an account */}
         <p className="text-center text-gray-600 mt-4">
           Don't have an account?{' '}
-          <a href="./Register.jsx" className="text-blue-600 hover:underline">
+          <Link to="/register" className="text-blue-600 hover:underline">
             Sign up
-          </a>
+          </Link>
         </p>
       </form>
     </div>

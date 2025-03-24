@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/*
+To be honest not sure if any of this is necessary, but we can use 
+this file to define global styles for the app and special tailwind
+classes that we want to use in the app. 
+*/
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

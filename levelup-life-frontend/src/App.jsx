@@ -1,5 +1,7 @@
 import React from 'react';
-import { createBrowserRouter, RouterProvider, Outlet, NavLink } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, NavLink } from 'react-router-dom'; //needed for routing stuff
+
+//all our headers being imported
 import Home from './components/Home';
 import Dashboard from './components/Dashboard';
 import HealthTracking from './components/HealthTracking';
@@ -8,7 +10,7 @@ import Register from './components/Register';
 import Login from './components/Login';
 import './App.css';
 
-// Layout component with navigation
+// Layout component with navigation that will wrap all the pages together
 const Layout = () => {
   return (
     <div className="min-h-screen bg-gray-100">
@@ -24,6 +26,8 @@ const Layout = () => {
           </ul>
         </div>
       </nav>
+      {/* Outlet is where child routes will be rendered */}
+        {/* This is a key part of nested routing in React Router */}
       <div className="p-4">
         <Outlet />
       </div>
@@ -32,12 +36,12 @@ const Layout = () => {
 };
 
 
-// Create router with data-router pattern
+// Create router with data-router pattern and route configuration
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Layout />,
-    children: [
+    path: "/", //root path
+    element: <Layout />, //layout component will be rendered for root path
+    children: [ //nested routes
       { index: true, element: <Home /> },
       { path: "dashboard", element: <Dashboard /> },
       { path: "health-tracking", element: <HealthTracking /> },
@@ -48,6 +52,9 @@ const router = createBrowserRouter([
   }
 ]);
 
+//defines the main app conponent
+ // Render the RouterProvider with the configured router
+// This sets up the routing system for the entire application
 const App = () => {
   return <RouterProvider router={router} />;
 };
