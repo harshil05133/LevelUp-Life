@@ -1,0 +1,7 @@
+- Forgot password doesnt work
+- task managment has bug for some reason
+- logout button isnt appearing/working
+- user info isnt appearing in the top left/right
+- stuff isnt saving
+
+im gonna cry

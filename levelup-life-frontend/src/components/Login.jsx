@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { login } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-
+import { AuthContext } from '../context/AuthContext';
 
 //useState is a hook that allows you to have state variables in functional components
 //useNavigate is a hook that allows you to navigate to different pages in your application
@@ -10,7 +10,8 @@ import { Link } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate(); //initialize the navigate function from the useNavigate hook
-  
+  const { setIsAuthenticated, setUser } = useContext(AuthContext);
+
   //use state returns array with the current state value, and a function to update the state
   const [formData, setFormData] = useState({
     email: '',
@@ -44,9 +45,14 @@ const Login = () => {
       // Store token in localStorage or sessionStorage based on remember me
       //local storage stays even after the browser is closed, session storage is cleared when the browser is closed
       const storage = rememberMe ? localStorage : sessionStorage;
-      storage.setItem('token', response.token); //store the jwt token in the selected storage
+      storage.setItem('token', response.token);
+      storage.setItem('user', JSON.stringify(response.user));
       
-      // Redirect to dashboard after successful login
+      /// Assuming the API returns user info
+    
+      setIsAuthenticated(true);
+      setUser(response.user);
+    
       navigate('/dashboard');
       
     } catch (error) {
@@ -117,9 +123,9 @@ const Login = () => {
           
           {/* Forgot password link */}
           <div className="text-sm">
-            <a href="/forgot-password" className="text-blue-600 hover:underline">
+            <Link to="/forgot-password" className="text-blue-600 hover:underline">
               Forgot your password?
-            </a>
+            </Link>
           </div>
         </div>
         

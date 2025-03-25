@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getTasks, createTask, updateTask, deleteTask } from '../api/tasks';
 
 //functional component TaskManagement
 const TaskManagement = () => {
@@ -9,87 +10,125 @@ const TaskManagement = () => {
     return today.toISOString().split('T')[0]; // Format as YYYY-MM-DD *changed later*
   });
   const [completedCount, setCompletedCount] = useState(0); //state for task counter
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Load tasks and completed count from localStorage on component mount
+  // Load tasks from API
   useEffect(() => {
-    const savedTasks = localStorage.getItem('tasks'); //get tasks from local storage
-    const savedCompletedCount = localStorage.getItem('completedCount'); //get completed count from local storage
-    
-    //if tasks and completed count exist in local storage, parse JSON and set them as the initial state
-    if (savedTasks) setTasks(JSON.parse(savedTasks));
-    if (savedCompletedCount) setCompletedCount(parseInt(savedCompletedCount));
+    const fetchTasks = async () => {
+      try {
+        const data = await getTasks();
+        setTasks(data);
+        setCompletedCount(data.filter(task => task.completed).length);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to load tasks');
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
   }, []);
 
-  // Save tasks and completed count to localStorage whenever they change as JSON string
-  useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    localStorage.setItem('completedCount', completedCount.toString());
-  }, [tasks, completedCount]);
-
-  //function to add a new task to the list
-  const addTask = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!taskName.trim()) return;
     
-    //update the tasks state by creating a new array with all existing tasks
-    setTasks([...tasks, { 
-      name: taskName, 
-      dueDate, 
-      completed: false,
-      id: Date.now() // unique ID for each task
-    }]);
-    setTaskName('');
-    setDueDate('');
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent page reload
-    if (taskName.trim()) { // Only add task if task name is not empty
-      addTask();
+    try {
+      const newTask = await createTask({
+        name: taskName,
+        dueDate
+      });
+      
+      setTasks([...tasks, newTask]);
+      setTaskName('');
+    } catch (err) {
+      setError('Failed to create task');
     }
   };
 
-  //function to delete a task from the list by task ID
-  const deleteTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id));
-  };
-
-  //function to toggle a tasks completion status
-  const toggleComplete = (id) => {
-    setTasks(tasks.map(task => {
-      if (task.id === id) {
-        // If task is being marked as completed (and wasn't before), increment counter
-        if (!task.completed) {
-          setCompletedCount(prev => prev + 1);
-        }
-        //return a new task object with the complete status toggled
-        return { ...task, completed: !task.completed };
+  const toggleComplete = async (id) => {
+    try {
+      const task = tasks.find(t => t._id === id);
+      const updatedTask = await updateTask(id, { 
+        completed: !task.completed 
+      });
+      
+      setTasks(tasks.map(t => t._id === id ? updatedTask : t));
+      
+      // Update completed count
+      if (!task.completed) {
+        setCompletedCount(prev => prev + 1);
+      } else {
+        setCompletedCount(prev => prev - 1);
       }
-      //for all other tasks, return them unchanged
-      return task;
-    }));
+    } catch (err) {
+      setError('Failed to update task');
+    }
   };
 
-  //function to reset the completed task counter to 0
-  const resetCompletedCount = () => {
-    setCompletedCount(0);
+  const handleDeleteTask = async (id) => {
+    try {
+      await deleteTask(id);
+      const task = tasks.find(t => t._id === id);
+      setTasks(tasks.filter(t => t._id !== id));
+      if (task.completed) {
+        setCompletedCount(prev => prev - 1);
+      }
+    } catch (err) {
+      setError('Failed to delete task');
+    }
   };
+
+  const resetCompletedCount = async () => {
+    try {
+      // Get all completed tasks
+      const completedTasks = tasks.filter(task => task.completed);
+      
+      // Update each completed task to be not completed
+      const updatePromises = completedTasks.map(task => 
+        updateTask(task._id, { completed: false })
+      );
+      
+      // Wait for all updates to complete
+      const updatedTasks = await Promise.all(updatePromises);
+      
+      // Update the tasks state
+      setTasks(tasks.map(task => {
+        if (task.completed) {
+          // Find the updated version of this task
+          const updated = updatedTasks.find(t => t._id === task._id);
+          return updated || {...task, completed: false};
+        }
+        return task;
+      }));
+      
+      // Reset the completed count
+      setCompletedCount(0);
+    } catch (err) {
+      setError('Failed to reset completed tasks');
+    }
+  };
+
+  if (loading) return <div className="text-center p-8">Loading tasks...</div>;
 
   //returns the page for the user to interact with
   return (
     <div className="min-h-screen p-8 bg-gray-100">
-      {/* Page title */}
       <h1 className="text-3xl font-bold mb-8">Task Management</h1>
+      
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
       
       {/* Completed counter and reset button */}
       <div className="flex justify-between items-center mb-6">
-        
-         {/* Counter display */}
         <div className="bg-white shadow rounded-lg p-3">
           <span className="font-bold text-lg">Completed Tasks: </span>
           <span className="text-green-600 font-bold text-lg">{completedCount}</span>
         </div>
-
-        {/* Reset button */}
         <button 
           onClick={resetCompletedCount}
           className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors duration-200"
@@ -100,89 +139,68 @@ const TaskManagement = () => {
       
       {/* Task input form */}
       <form onSubmit={handleSubmit} className="mb-8 bg-white p-6 rounded-lg shadow-md">
-      <div className="flex flex-col md:flex-row gap-3">
-        
-        {/* Task name input */}
-        <input
-          placeholder="Task name"
-          value={taskName}
-          onChange={(e) => setTaskName(e.target.value)}
-          className="p-3 border border-gray-300 rounded flex-grow"
-        />
-        {/* Due date input */}
-        <input
-          type="date"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-          className="p-3 border border-gray-300 rounded w-full md:w-auto"
-        />
-        {/* Add task button */}
-        <button 
-          type="submit"
-          className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded transition-colors duration-200 font-medium"
-        >
+        <div className="flex flex-col md:flex-row gap-3">
+          <input
+            placeholder="Task name"
+            value={taskName}
+            onChange={(e) => setTaskName(e.target.value)}
+            className="p-3 border border-gray-300 rounded flex-grow"
+          />
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            className="p-3 border border-gray-300 rounded w-full md:w-auto"
+          />
+          <button 
+            type="submit"
+            className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded transition-colors duration-200 font-medium"
+          >
             Add Task
           </button>
         </div>
       </form>
       
-      {/* Task list section*/}
+      {/* Task list */}
       <div className="space-y-3">
-
-         {/* Conditional rendering based on whether tasks exist */}
         {tasks.length === 0 ? (
-          // Empty state message when no tasks exist
           <div className="text-center p-8 bg-white rounded-lg shadow">
             <p className="text-gray-500">No tasks yet. Add some tasks to get started!</p>
           </div>
         ) : (
-          // Map through tasks array to render each task
           tasks.map((task, index) => (
-            // Task item container with conditional styling for completed tasks
             <div 
-              key={task.id} 
+              key={task._id} 
               className={`p-4 bg-white shadow-md rounded-lg flex items-center justify-between transition-all duration-200 ${
                 task.completed ? 'border-l-4 border-green-500 bg-green-50' : ''
               }`}
             >
-              {/* Left side with task number and details */}
               <div className="flex items-center">
-                {/* Circular task number indicator */}
                 <span className="bg-gray-200 text-gray-800 font-bold rounded-full h-8 w-8 flex items-center justify-center mr-3">
                   {index + 1}
                 </span>
-
-                 {/* Task name and due date */}
                 <div>
-                   {/* Task name with conditional styling for completed tasks */}
                   <span className={`block text-lg font-semibold ${task.completed ? 'line-through text-gray-500' : ''}`}>
                     {task.name}
                   </span>
-
-                   {/* Due date formatted as MM/DD/YYYY */}
                   <span className="block text-gray-600">
                     {task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US') : 'No due date'}
                   </span>
                 </div>
               </div>
-
-                {/* Right side with action buttons */}
               <div className="flex space-x-2">
-                {/* Complete/Undo button with conditional styling */}
                 <button
-                  onClick={() => toggleComplete(task.id)}
+                  onClick={() => toggleComplete(task._id)}
                   className={`px-3 py-1 rounded text-white ${
                     task.completed 
                       ? 'bg-gray-400 hover:bg-gray-500' 
                       : 'bg-blue-400 hover:bg-blue-500'
                   } transition-colors duration-200`}
                 >
-                  {/* Button text changes based on task completion status */}
-                  {task.completed ? 'Undo' : 'Completed'}
+                  {task.completed ? 'Undo' : 'Complete'}
                 </button>
-                 {/* Delete button */}
                 <button
-                  onClick={() => deleteTask(task.id)}
+                  onClick={() => handleDeleteTask(task._id)}
                   className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded transition-colors duration-200"
                 >
                   Delete

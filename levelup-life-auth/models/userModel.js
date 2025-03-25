@@ -3,6 +3,9 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+
+
+
 // Create a new mongoose schema that defines the structure of the User document in MongoDB
 const userSchema = new mongoose.Schema({
   username: {

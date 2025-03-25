@@ -5,6 +5,7 @@ const express = require('express');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const dotenv = require('dotenv');
+const taskRoutes = require('./routes/taskRoutes');
 const cors = require('cors');
 const app = express();
 
@@ -23,6 +24,9 @@ app.use(cors());
 
 // mount the auth routes at the /api/auth endpoint
 app.use('/api/auth', authRoutes);
+
+// mount the task routes at the /api/tasks endpoint
+app.use('/api/tasks', taskRoutes);
 
 //set the port for the backend server
 //start the server and listen on the specified port
