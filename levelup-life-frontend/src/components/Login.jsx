@@ -3,6 +3,7 @@ import { login } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 //useState is a hook that allows you to have state variables in functional components
 //useNavigate is a hook that allows you to navigate to different pages in your application
@@ -10,7 +11,12 @@ import { AuthContext } from '../context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate(); //initialize the navigate function from the useNavigate hook
-  const { setIsAuthenticated, setUser } = useContext(AuthContext);
+  const { setIsAuthenticated, setUser: setContextUser } = useContext(AuthContext);
+
+
+  const [, setStoredToken] = useLocalStorage('token', null);
+  const [, setStoredUser] = useLocalStorage('user', null);
+
 
   //use state returns array with the current state value, and a function to update the state
   const [formData, setFormData] = useState({
@@ -42,18 +48,19 @@ const Login = () => {
     try {
       const response = await login(formData);
       
-      // Store token in localStorage or sessionStorage based on remember me
-      //local storage stays even after the browser is closed, session storage is cleared when the browser is closed
-      const storage = rememberMe ? localStorage : sessionStorage;
-      storage.setItem('token', response.token);
-      storage.setItem('user', JSON.stringify(response.user));
-      
+      // Use the custom hooks to store data
+      setStoredToken(response.token);
+      setStoredUser(response.user);
+    
       /// Assuming the API returns user info
     
       setIsAuthenticated(true);
-      setUser(response.user);
+      setContextUser(response.user);
     
-      navigate('/dashboard');
+      // Navigate after a short delay
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 100);
       
     } catch (error) {
       setError(error.response?.data?.message || 'Invalid email or password');

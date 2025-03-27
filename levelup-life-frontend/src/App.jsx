@@ -41,7 +41,7 @@ const Layout = () => {
               </div>
               <button 
                 onClick={logout}
-                className="bg-white text-green-500 px-4 py-2 rounded hover:bg-gray-100 transition-colors duration-200"
+                className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-300 transition-colors duration-200"
               >
                 Logout
               </button>

@@ -17,6 +17,20 @@ const TaskManagement = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
+        // Add this manual request to verify token
+        console.log('Token for manual request:', localStorage.getItem('token'));
+        const manualResponse = await fetch('http://localhost:5000/api/tasks', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        console.log('Manual request status:', manualResponse.status);
+        if (manualResponse.ok) {
+          const manualData = await manualResponse.json();
+          console.log('Manual request data:', manualData);
+        }
+  
+        // Your existing axios request
         const data = await getTasks();
         setTasks(data);
         setCompletedCount(data.filter(task => task.completed).length);

@@ -1,33 +1,35 @@
-import axios from 'axios';
+import axiosInstance from './axiosInstance'; // Import the axios instance for consistent configuration
 
-const API_URL = 'http://localhost:5000/api/tasks';
+const API_URL = '/tasks';
 
-const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  };
-};
+// const getAuthHeader = () => {
+//   const token = localStorage.getItem('token');
+//   console.log("Token in localStorage:", localStorage.getItem('token'));
+//   return {
+//     headers: {
+//       Authorization: `Bearer ${token}`
+//     }
+//   };
+  
+// };
 
 export const getTasks = async () => {
-  const response = await axios.get(API_URL, getAuthHeader());
+  const response = await axiosInstance.get(API_URL);
   return response.data;
 };
 
 export const createTask = async (taskData) => {
-  const response = await axios.post(API_URL, taskData, getAuthHeader());
+  const response = await axiosInstance.post(API_URL, taskData);
   return response.data;
 };
 
 export const updateTask = async (id, taskData) => {
-  const response = await axios.put(`${API_URL}/${id}`, taskData, getAuthHeader());
+  const response = await axiosInstance.put(`${API_URL}/${id}`, taskData);
   return response.data;
 };
 
 export const deleteTask = async (id) => {
-  const response = await axios.delete(`${API_URL}/${id}`, getAuthHeader());
+  const response = await axiosInstance.delete(`${API_URL}/${id}`);
   return response.data;
 };
 // This code provides functions to interact with the task API.
