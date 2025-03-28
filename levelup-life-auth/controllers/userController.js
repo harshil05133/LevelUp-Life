@@ -22,6 +22,7 @@ exports.getUserStats = async (req, res) => {
 
 exports.updateUserXP = async (req, res) => {
   try {
+    const xpPerLevel = 500; // XP required to level up
     const { xpAmount } = req.body;
     const user = await User.findById(req.user);
     
@@ -33,8 +34,8 @@ exports.updateUserXP = async (req, res) => {
     user.totalXP += xpAmount;
     
     // Calculate level and XP to next level
-    user.level = Math.floor(user.totalXP / 500); // Assuming 500 XP per level
-    user.xpToNextLevel = (user.level + 1) * 500; // Next level XP requirement
+    user.level = Math.floor(user.totalXP / xpPerLevel); // Assuming 500 XP per level
+    user.xpToNextLevel = (user.level + 1) * xpPerLevel; // Next level XP requirement
     
     await user.save();
     

@@ -200,7 +200,7 @@ const TaskManagement = () => {
           </div>
           <div>
             <span className="font-bold text-lg">XP: </span>
-            <span className="text-blue-600 font-bold text-lg">{totalXP}/{xpToNextLevel}</span>
+            <span className="text-blue-600 font-bold text-lg">{totalXP%500}/{500}</span>
           </div>
         </div>
         <button 
@@ -215,7 +215,7 @@ const TaskManagement = () => {
       <div className="w-full bg-gray-200 rounded-full h-4 mb-6">
         <div 
           className="bg-blue-600 h-4 rounded-full transition-all duration-500 ease-out"
-          style={{ width: `${Math.min(100, (totalXP % xpToNextLevel) / (xpToNextLevel / 100))}%` }}
+          style={{ width: `${Math.min(100, ((totalXP % 500) / 500) * 100)}%` }}
         ></div>
       </div>
       
