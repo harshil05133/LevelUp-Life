@@ -12,7 +12,6 @@ const TaskManagement = () => {
     const today = new Date();
     return today.toISOString().split('T')[0]; // Format as YYYY-MM-DD *changed later*
   });
-  const [totalPoints, setTotalPoints] = useState(0); //state for total points
   const [completedCount, setCompletedCount] = useState(0); //state for task counter
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,7 +20,6 @@ const TaskManagement = () => {
   const [totalXP, setTotalXP] = useState(0); //state for total xp
   const [level, setLevel] = useState(1); //state for current level
   const [xpToNextLevel, setXpToNextLevel] = useState(500); //state for xp needed to level up
-  const XP_PER_TASK = 100; //constant for xp gained per task
 
   // Load tasks from API
   useEffect(() => {
@@ -98,21 +96,21 @@ const TaskManagement = () => {
       if (!task.completed) {
         setCompletedCount(prev => prev + 1);
         // Add XP when completing a task
-        const response = await updateUserXP({ xpAmount: XP_PER_TASK });
+        const response = await updateUserXP({ xpAmount: task.points });
         setTotalXP(response.totalXP);
         setLevel(response.level);
         setXpToNextLevel(response.xpToNextLevel);
-        alert(`Congratulations! You've leveled up to level ${response.level}!`); // Notify user of level up
+        //alert(`Congratulations! You've leveled up to level ${response.level}!`); // Notify user of level up
 
       } else {
         setCompletedCount(prev => prev - 1);
 
         //Remove XP when uncompleting a task
-         const response = await updateUserXP({ xpAmount: -XP_PER_TASK });
+         const response = await updateUserXP({ xpAmount: -task.points });
         setTotalXP(response.totalXP);
         setLevel(response.level);
         setXpToNextLevel(response.xpToNextLevel);
-        alert(`You've leveled down to level ${response.level}. Keep going!`); // Notify user of level down
+        //alert(`You've leveled down to level ${response.level}. Keep going!`); // Notify user of level down
         
       }
     } catch (err) {

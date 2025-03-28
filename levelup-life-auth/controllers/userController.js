@@ -32,10 +32,10 @@ exports.updateUserXP = async (req, res) => {
     // Add XP
     user.totalXP += xpAmount;
     
-    // Check for level up
-    while (user.totalXP >= user.xpToNextLevel) {
-      user.level += 1;
-      user.xpToNextLevel = user.level * 500; // 500 XP per level
+    // Check for level up or down
+    if (user.totalXP >= user.xpToNextLevel) {
+      user.level = Math.floor(user.totalXP / 500); // Assuming 500 XP per level
+      user.xpToNextLevel = (user.level + 1) * 500; // Next level XP requirement
     }
     
     await user.save();
