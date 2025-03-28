@@ -22,6 +22,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  totalXP: {
+    type: Number,
+    default: 0
+  },
+  level: {
+    type: Number,
+    default: 1
+  },
+  xpToNextLevel: {
+    type: Number,
+    default: 500
+  },
 });
 
 //middleware function that runs before presaving a document

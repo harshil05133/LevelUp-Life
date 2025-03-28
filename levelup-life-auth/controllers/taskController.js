@@ -53,5 +53,7 @@ exports.deleteTask = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 // This code defines the task controller for handling CRUD operations on tasks.
 // It includes methods to get all tasks, create a new task, update an existing task, and delete a task.
