@@ -16,6 +16,14 @@ const taskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User', 
     required: true 
+  },
+  points: { //TODO : change the default value depending on scale
+    type: Number, 
+    default: 50
+  },
+  type: { //TODO : use this to add points to specific stats
+    type: String, 
+    default: 'general'
   }
 });
 

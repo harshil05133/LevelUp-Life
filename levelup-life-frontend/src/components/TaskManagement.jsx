@@ -5,10 +5,13 @@ import { getTasks, createTask, updateTask, deleteTask } from '../api/tasks';
 const TaskManagement = () => {
   const [tasks, setTasks] = useState([]); //initally empty array for lists of tasks
   const [taskName, setTaskName] = useState(''); //state for current task name input
+  const [points, setPoints] = useState(0); //state for points input
+  const [taskType, setTaskType] = useState(''); //state for task type input
   const [dueDate, setDueDate] = useState(() => { //state for due date input, initialied with todays date
     const today = new Date();
     return today.toISOString().split('T')[0]; // Format as YYYY-MM-DD *changed later*
   });
+  const [totalPoints, setTotalPoints] = useState(0); //state for total points
   const [completedCount, setCompletedCount] = useState(0); //state for task counter
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -47,15 +50,21 @@ const TaskManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!taskName.trim()) return;
+    if (!points) return;
+    if (!taskType) return;
     
     try {
       const newTask = await createTask({
         name: taskName,
-        dueDate
+        dueDate,
+        points,
+        type: taskType
       });
       
       setTasks([...tasks, newTask]);
       setTaskName('');
+      setPoints(0);
+      setTaskType('');
     } catch (err) {
       setError('Failed to create task');
     }
@@ -161,6 +170,19 @@ const TaskManagement = () => {
             className="p-3 border border-gray-300 rounded flex-grow"
           />
           <input
+            placeholder="Points"
+            type="number"
+            value={points}
+            onChange={(e) => setPoints(e.target.value)}
+            className="p-3 border border-gray-300 rounded w-full md:w-auto"
+          />
+          <input
+            placeholder="Task type"
+            value={taskType}
+            onChange={(e) => setTaskType(e.target.value)}
+            className="p-3 border border-gray-300 rounded w-full md:w-auto"
+          />
+          <input
             type="date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
@@ -201,6 +223,12 @@ const TaskManagement = () => {
                     {task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US') : 'No due date'}
                   </span>
                 </div>
+              </div>
+              <div className="block text-lg font-semibold">
+                {task.points} points
+              </div>
+              <div className="block text-lg font-semibold">
+                {task.type}
               </div>
               <div className="flex space-x-2">
                 <button
