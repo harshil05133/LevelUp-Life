@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getTasks, createTask, updateTask, deleteTask } from '../api/tasks';
+import { getUserStats, updateUserXP } from '../api/user';
 
 //functional component TaskManagement
 const TaskManagement = () => {
@@ -16,11 +17,17 @@ const TaskManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  //some states for the xp and level up system
+  const [totalXP, setTotalXP] = useState(0); //state for total xp
+  const [level, setLevel] = useState(1); //state for current level
+  const [xpToNextLevel, setXpToNextLevel] = useState(500); //state for xp needed to level up
+  const XP_PER_TASK = 100; //constant for xp gained per task
+
   // Load tasks from API
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        // Add this manual request to verify token
+        // Added this manual request to verify token
         console.log('Token for manual request:', localStorage.getItem('token'));
         const manualResponse = await fetch('http://localhost:5000/api/tasks', {
           headers: {
@@ -33,11 +40,19 @@ const TaskManagement = () => {
           console.log('Manual request data:', manualData);
         }
   
-        // Your existing axios request
         const data = await getTasks();
+        
+        // Fetch user stats
+        const stats = await getUserStats();
+        setTotalXP(stats.totalXP);
+        setLevel(stats.level);
+        setXpToNextLevel(stats.xpToNextLevel);
+
+
         setTasks(data);
         setCompletedCount(data.filter(task => task.completed).length);
         setLoading(false);
+
       } catch (err) {
         setError('Failed to load tasks');
         setLoading(false);
@@ -82,8 +97,23 @@ const TaskManagement = () => {
       // Update completed count
       if (!task.completed) {
         setCompletedCount(prev => prev + 1);
+        // Add XP when completing a task
+        const response = await updateUserXP({ xpAmount: XP_PER_TASK });
+        setTotalXP(response.totalXP);
+        setLevel(response.level);
+        setXpToNextLevel(response.xpToNextLevel);
+        alert(`Congratulations! You've leveled up to level ${response.level}!`); // Notify user of level up
+
       } else {
         setCompletedCount(prev => prev - 1);
+
+        //Remove XP when uncompleting a task
+         const response = await updateUserXP({ xpAmount: -XP_PER_TASK });
+        setTotalXP(response.totalXP);
+        setLevel(response.level);
+        setXpToNextLevel(response.xpToNextLevel);
+        alert(`You've leveled down to level ${response.level}. Keep going!`); // Notify user of level down
+        
       }
     } catch (err) {
       setError('Failed to update task');
@@ -128,6 +158,13 @@ const TaskManagement = () => {
       
       // Reset the completed count
       setCompletedCount(0);
+
+      // Reset XP and level
+      setTotalXP(0); //reset xp to 0
+      setLevel(1); //reset level to 1
+      setXpToNextLevel(500);
+      alert('Completed tasks have been reset.'); // Notify user of reset
+
     } catch (err) {
       setError('Failed to reset completed tasks');
     }
@@ -147,17 +184,36 @@ const TaskManagement = () => {
       )}
       
       {/* Completed counter and reset button */}
+      {/* XP and Level display */}
       <div className="flex justify-between items-center mb-6">
-        <div className="bg-white shadow rounded-lg p-3">
-          <span className="font-bold text-lg">Completed Tasks: </span>
-          <span className="text-green-600 font-bold text-lg">{completedCount}</span>
+        <div className="bg-white shadow rounded-lg p-3 flex space-x-4">
+          <div>
+            <span className="font-bold text-lg">Completed Tasks: </span>
+            <span className="text-green-600 font-bold text-lg">{completedCount}</span>
+          </div>
+          <div>
+            <span className="font-bold text-lg">Level: </span>
+            <span className="text-purple-600 font-bold text-lg">{level}</span>
+          </div>
+          <div>
+            <span className="font-bold text-lg">XP: </span>
+            <span className="text-blue-600 font-bold text-lg">{totalXP}/{xpToNextLevel}</span>
+          </div>
         </div>
         <button 
           onClick={resetCompletedCount}
           className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors duration-200"
         >
-          Reset Counter
+          Reset Progress
         </button>
+      </div>
+
+      {/* XP Progress Bar */}
+      <div className="w-full bg-gray-200 rounded-full h-4 mb-6">
+        <div 
+          className="bg-blue-600 h-4 rounded-full transition-all duration-500 ease-out"
+          style={{ width: `${Math.min(100, (totalXP % xpToNextLevel) / (xpToNextLevel / 100))}%` }}
+        ></div>
       </div>
       
       {/* Task input form */}
