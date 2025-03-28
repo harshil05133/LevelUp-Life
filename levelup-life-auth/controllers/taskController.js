@@ -12,9 +12,11 @@ exports.getTasks = async (req, res) => {
 exports.createTask = async (req, res) => {
   try {
     const { name, dueDate } = req.body;
+    const updatedDueDate = new Date(dueDate);
+    updatedDueDate.setHours(updatedDueDate.getHours() + 4); // for some reason the date only displays correctly if it is 4 hours ahead
     const task = new Task({
       name,
-      dueDate,
+      dueDate: updatedDueDate,
       userId: req.user
     });
     await task.save();

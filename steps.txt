@@ -36,13 +36,16 @@ here are the extra stuff i downloaded
 
 
 To start the backend:
-  - cd into the auth folder
+  - cd into the auth folder (levelup-life-auth)
   - run node app.js
   - available at http://localhost:5000
 
 (I normally split the terminal)
 
 To start the frontend:
-  - cd into the frontend folder
+  - cd into the frontend folder (levelup-life-frontend)
   - run npm run dev
   - available at http://localhost:5173 
+
+If powershell is giving security problems, try pasting this then starting back/front end:
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
