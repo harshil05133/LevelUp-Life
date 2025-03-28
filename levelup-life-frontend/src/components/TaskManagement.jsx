@@ -159,11 +159,16 @@ const TaskManagement = () => {
       // Reset the completed count
       setCompletedCount(0);
 
-      // Reset XP and level
-      setTotalXP(0); //reset xp to 0
-      setLevel(1); //reset level to 1
-      setXpToNextLevel(500);
+      // Reset XP and level in the database
+      const response = await updateUserXP({ xpAmount: -totalXP }); // Subtract all current XP
+      
+      // Update local state with response from server
+      setTotalXP(response.totalXP);
+      setLevel(response.level);
+      setXpToNextLevel(response.xpToNextLevel);
+      
       alert('Completed tasks have been reset.'); // Notify user of reset
+
 
     } catch (err) {
       setError('Failed to reset completed tasks');
