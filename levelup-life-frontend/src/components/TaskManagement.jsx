@@ -20,7 +20,6 @@ const TaskManagement = () => {
   const [totalXP, setTotalXP] = useState(0); //state for total xp
   const [level, setLevel] = useState(1); //state for current level
   const [xpToNextLevel, setXpToNextLevel] = useState(500); //state for xp needed to level up
-  const XP_PER_TASK = 100; //constant for xp gained per task
 
   // Load tasks from API
   useEffect(() => {
