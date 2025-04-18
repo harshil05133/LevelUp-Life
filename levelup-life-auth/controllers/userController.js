@@ -79,6 +79,11 @@ exports.addFriend = async (req, res) => {
       return res.status(404).json({ error: 'User or friend not found' });
     }
 
+    // Prevent adding yourself as a friend
+    if (user._id.toString() === friend._id.toString()) {
+      return res.status(400).json({ error: 'Cannot add yourself as a friend' });
+    }
+
     // Avoid adding duplicates
     if (user.friends.includes(friend._id)) {
       return res.status(400).json({ error: 'Already friends' });

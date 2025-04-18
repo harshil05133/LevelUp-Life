@@ -54,7 +54,12 @@ const Social = () => {
       // Refresh leaderboard after adding a friend
       await fetchLeaderboard();
     } catch (err) {
-      setError('Failed to add friend');
+      // Display the error message returned by the backend
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error); // Use the backend error message
+      } else {
+        setError('Failed to add friend'); // Fallback for unexpected errors
+      }
     }
   };
 
