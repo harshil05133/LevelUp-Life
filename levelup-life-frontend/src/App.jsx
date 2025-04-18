@@ -30,7 +30,7 @@ const Layout = () => {
             <li><NavLink to="/health-tracking" className={({isActive}) => isActive ? "text-white font-bold" : "text-white hover:text-gray-200"}>Health Tracking</NavLink></li>
             <li><NavLink to="/task-management" className={({isActive}) => isActive ? "text-white font-bold" : "text-white hover:text-gray-200"}>Task Management</NavLink></li>
           </ul>
-
+            
           {isAuthenticated && user ? (
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
