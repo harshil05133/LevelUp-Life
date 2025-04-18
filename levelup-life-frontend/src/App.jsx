@@ -14,6 +14,7 @@ import { AuthContext, AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
+import Social from './components/Social'; // Import the Social component
 import './App.css';
 
 // Layout component with navigation that will wrap all the pages together
@@ -27,6 +28,7 @@ const Layout = () => {
           <ul className="flex justify-center space-x-8">
             <li><NavLink to="/" className={({isActive}) => isActive ? "text-white font-bold" : "text-white hover:text-gray-200"}>Home</NavLink></li>
             <li><NavLink to="/dashboard" className={({isActive}) => isActive ? "text-white font-bold" : "text-white hover:text-gray-200"}>Dashboard</NavLink></li>
+            <li><NavLink to="/social" className={({isActive}) => isActive ? "text-white font-bold" : "text-white hover:text-gray-200"}>Social</NavLink></li>
             <li><NavLink to="/health-tracking" className={({isActive}) => isActive ? "text-white font-bold" : "text-white hover:text-gray-200"}>Health Tracking</NavLink></li>
             <li><NavLink to="/task-management" className={({isActive}) => isActive ? "text-white font-bold" : "text-white hover:text-gray-200"}>Task Management</NavLink></li>
           </ul>
@@ -75,6 +77,7 @@ const App = () => {
           <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="health-tracking" element={<ProtectedRoute><HealthTracking /></ProtectedRoute>} />
           <Route path="task-management" element={<ProtectedRoute><TaskManagement /></ProtectedRoute>} />
+          <Route path="social" element={<ProtectedRoute><Social /></ProtectedRoute>} />
           <Route path="register" element={<Register />} />
           <Route path="login" element={<Login />} />
           <Route path="forgot-password" element={<ForgotPassword />} />

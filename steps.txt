@@ -36,14 +36,14 @@ here are the extra stuff i downloaded
 
 
 To start the backend:
-  - cd into the auth folder (levelup-life-auth)
+  - cd into the auth folder (cd levelup-life-auth)
   - run node app.js
   - available at http://localhost:5000
 
 (I normally split the terminal)
 
 To start the frontend:
-  - cd into the frontend folder (levelup-life-frontend)
+  - cd into the frontend folder (cd levelup-life-frontend)
   - run npm run dev
   - available at http://localhost:5173 
 

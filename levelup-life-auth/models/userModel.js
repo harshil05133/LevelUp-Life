@@ -3,9 +3,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-
-
-
 // Create a new mongoose schema that defines the structure of the User document in MongoDB
 const userSchema = new mongoose.Schema({
   username: {
@@ -33,6 +30,19 @@ const userSchema = new mongoose.Schema({
   xpToNextLevel: {
     type: Number,
     default: 500
+  },
+  /*friends: [//linked list of objects, each object represents a friend
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      next: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // Points to the next friend
+    }
+  ],*/
+  friends: [{ //array of friend objects
+    type: mongoose.Schema.Types.ObjectId, ref: 'User' 
+  }],
+  friendRequests: {
+    type: [String], // Array of usernames of friend requests received
+    default: []
   },
 });
 
