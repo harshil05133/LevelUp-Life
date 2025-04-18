@@ -57,7 +57,7 @@ const Layout = () => {
       </nav>
       {/* Outlet is where child routes will be rendered */}
         {/* This is a key part of nested routing in React Router */}
-      <div className="p-4">
+      <div>
         <Outlet />
       </div>
     </div>

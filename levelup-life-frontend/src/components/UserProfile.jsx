@@ -33,7 +33,7 @@ const UserProfile = () => {
         {user.username ? user.username[0].toUpperCase() : '?'}
       </div>
       <div>
-        <h2 className="text-2xl font-bold mb-1">Welcome back, {user.username || 'User'}!</h2>
+        <h2 className="text-2xl font-bold mb-5">Welcome back, {user.username || 'User'}!</h2>
         <div className="flex space-x-4">
           <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full font-semibold">
             Level {userStats.level}
