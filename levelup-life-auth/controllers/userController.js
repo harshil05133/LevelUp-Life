@@ -13,7 +13,8 @@ exports.getUserStats = async (req, res) => {
     res.json({
       totalXP: user.totalXP,
       level: user.level,
-      xpToNextLevel: user.xpToNextLevel
+      xpToNextLevel: user.xpToNextLevel,
+      streak: user.streak
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -23,7 +24,7 @@ exports.getUserStats = async (req, res) => {
 exports.updateUserXP = async (req, res) => {
   try {
     const xpPerLevel = 500; // XP required to level up
-    const { xpAmount } = req.body;
+    const { xpAmount, resetStreak } = req.body;
     const user = await User.findById(req.user);
     
     if (!user) {
@@ -37,12 +38,22 @@ exports.updateUserXP = async (req, res) => {
     user.level = Math.floor(user.totalXP / xpPerLevel); // Assuming 500 XP per level
     user.xpToNextLevel = (user.level + 1) * xpPerLevel; // Next level XP requirement
     
+    // Reset streak
+    if (resetStreak) {
+      user.streak = {
+        count: 0,
+        tasksCompletedToday: 0,
+        lastTaskDate: null
+      };
+    }
+    
     await user.save();
     
     res.json({
       totalXP: user.totalXP,
       level: user.level,
-      xpToNextLevel: user.xpToNextLevel
+      xpToNextLevel: user.xpToNextLevel,
+      streak: user.streak
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

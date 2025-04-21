@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getTasks, createTask, updateTask, deleteTask } from '../api/tasks';
 import { getUserStats, updateUserXP } from '../api/user';
+import StreakDisplay from './StreakDisplay';
 
 //functional component TaskManagement
 const TaskManagement = () => {
@@ -20,6 +21,7 @@ const TaskManagement = () => {
   const [totalXP, setTotalXP] = useState(0); //state for total xp
   const [level, setLevel] = useState(1); //state for current level
   const [xpToNextLevel, setXpToNextLevel] = useState(500); //state for xp needed to level up
+  const [streak, setStreak] = useState({ count: 0, tasksCompletedToday: 0 }); // state for streak tracking
 
   // Load tasks from API
   useEffect(() => {
@@ -38,17 +40,16 @@ const TaskManagement = () => {
           console.log('Manual request data:', manualData);
         }
   
-        const data = await getTasks();
+        const response = await getTasks();
         
         // Fetch user stats
         const stats = await getUserStats();
         setTotalXP(stats.totalXP);
         setLevel(stats.level);
         setXpToNextLevel(stats.xpToNextLevel);
-
-
-        setTasks(data);
-        setCompletedCount(data.filter(task => task.completed).length);
+        setTasks(response.tasks);
+        setStreak(response.streak);
+        setCompletedCount(response.tasks.filter(task => task.completed).length);
         setLoading(false);
 
       } catch (err) {
@@ -86,11 +87,12 @@ const TaskManagement = () => {
   const toggleComplete = async (id) => {
     try {
       const task = tasks.find(t => t._id === id);
-      const updatedTask = await updateTask(id, { 
+      const response = await updateTask(id, { 
         completed: !task.completed 
       });
       
-      setTasks(tasks.map(t => t._id === id ? updatedTask : t));
+      setTasks(tasks.map(t => t._id === id ? response.task : t));
+      setStreak(response.streak);
       
       // Update completed count
       if (!task.completed) {
@@ -158,14 +160,15 @@ const TaskManagement = () => {
       setCompletedCount(0);
 
       // Reset XP and level in the database
-      const response = await updateUserXP({ xpAmount: -totalXP }); // Subtract all current XP
+      const response = await updateUserXP({ xpAmount: -totalXP, resetStreak: true }); // Subtract all XP and reset streak
       
       // Update local state with response from server
       setTotalXP(response.totalXP);
       setLevel(response.level);
       setXpToNextLevel(response.xpToNextLevel);
+      setStreak({ count: 0, tasksCompletedToday: 0 });
       
-      alert('Completed tasks have been reset.'); // Notify user of reset
+      alert('Progress and streak have been reset.'); // Updated message
 
 
     } catch (err) {
@@ -219,6 +222,9 @@ const TaskManagement = () => {
         ></div>
       </div>
       
+      {/* Streak Display */}
+      <StreakDisplay currentStreak={streak.count} />
+
       {/* Task input form */}
       <form onSubmit={handleSubmit} className="mb-8 bg-white p-6 rounded-lg shadow-md">
         <div className="flex flex-col md:flex-row gap-3">

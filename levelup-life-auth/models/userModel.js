@@ -44,6 +44,20 @@ const userSchema = new mongoose.Schema({
     type: [String], // Array of usernames of friend requests received
     default: []
   },
+  streak: {
+    count: {
+      type: Number,
+      default: 0
+    },
+    lastTaskDate: {
+      type: Date,
+      default: null
+    },
+    tasksCompletedToday: {
+      type: Number,
+      default: 0
+    }
+  },
 });
 
 //middleware function that runs before presaving a document
