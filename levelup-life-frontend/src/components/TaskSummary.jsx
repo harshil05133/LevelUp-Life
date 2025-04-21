@@ -22,7 +22,7 @@ const TaskSummary = () => {
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-6">
       <h3 className="text-xl font-bold mb-2">Task Summary</h3>
-      <div className="flex items-center space-x-6">
+      <div className="flex justify-center items-center space-x-6">
         <div className="text-green-600 font-bold">✅ Completed: {completed}</div>
         <div className="text-yellow-600 font-bold">🕒 Pending: {total - completed}</div>
         <div className="text-blue-600 font-bold">📋 Total: {total}</div>
