@@ -8,6 +8,7 @@ const dotenv = require('dotenv');
 const taskRoutes = require('./routes/taskRoutes');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
+const healthRoutes = require('./routes/healthRoutes');
 const app = express();
 
 //load the .env file into process.env
@@ -34,5 +35,8 @@ app.use('/api/tasks', taskRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// app.js
+// mount the user routes at the /api/user endpoint
 app.use('/api/user', userRoutes);
+
+// mount the health routes at the /api/health endpoint
+app.use('/api/health', healthRoutes);
