@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="levelup-life cover.png" alt="LevelUp-Life Cover" width="600" />
+  <img src="levelup-life-cover.png" alt="LevelUp-Life Cover" width="600" />
 </p>
 
 # LevelUp-Life
