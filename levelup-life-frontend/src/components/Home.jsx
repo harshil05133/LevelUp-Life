@@ -32,7 +32,7 @@ function Home() {
           className="
             mt-7 inline-block
             px-8 py-3
-            bg-gradient-to-r from-blue-400 to-green-400
+            bg-gradient-to-br from-blue-400 via-green-400 to-green-400
             rounded-full font-medium text-xl
             transition-colors duration-200 ease-out
             hover:from-blue-500 hover:to-green-500
