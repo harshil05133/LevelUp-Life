@@ -16,6 +16,7 @@ const TaskManagement = () => {
   const [completedCount, setCompletedCount] = useState(0); //state for task counter
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [updatingTasks, setUpdatingTasks] = useState({}); // Track tasks being updated
 
   //some states for the xp and level up system
   const [totalXP, setTotalXP] = useState(0); //state for total xp
@@ -39,7 +40,7 @@ const TaskManagement = () => {
           const manualData = await manualResponse.json();
           console.log('Manual request data:', manualData);
         }
-  
+
         const response = await getTasks();
         
         // Fetch user stats
@@ -85,38 +86,38 @@ const TaskManagement = () => {
   };
 
   const toggleComplete = async (id) => {
+    // Prevent multiple clicks while processing
+    if (updatingTasks[id]) return;
+
     try {
+      setUpdatingTasks(prev => ({ ...prev, [id]: true }));
       const task = tasks.find(t => t._id === id);
-      const response = await updateTask(id, { 
-        completed: !task.completed 
-      });
+      
+      // Optimistically update UI
+      const updatedTask = { ...task, completed: !task.completed };
+      setTasks(tasks.map(t => t._id === id ? updatedTask : t));
+      setCompletedCount(prev => task.completed ? prev - 1 : prev + 1);
+
+      // Make API call
+      const response = await updateTask(id, { completed: !task.completed });
       
       setTasks(tasks.map(t => t._id === id ? response.task : t));
       setStreak(response.streak);
       
       // Update completed count
       if (!task.completed) {
-        setCompletedCount(prev => prev + 1);
-        // Add XP when completing a task
-        const response = await updateUserXP({ xpAmount: task.points });
-        setTotalXP(response.totalXP);
-        setLevel(response.level);
-        setXpToNextLevel(response.xpToNextLevel);
-        //alert(`Congratulations! You've leveled up to level ${response.level}!`); // Notify user of level up
-
-      } else {
-        setCompletedCount(prev => prev - 1);
-
-        //Remove XP when uncompleting a task
-         const response = await updateUserXP({ xpAmount: -task.points });
-        setTotalXP(response.totalXP);
-        setLevel(response.level);
-        setXpToNextLevel(response.xpToNextLevel);
-        //alert(`You've leveled down to level ${response.level}. Keep going!`); // Notify user of level down
-        
+        const xpResponse = await updateUserXP({ xpAmount: task.points });
+        setTotalXP(xpResponse.totalXP);
+        setLevel(xpResponse.level);
+        setXpToNextLevel(xpResponse.xpToNextLevel);
       }
     } catch (err) {
+      const task = tasks.find(t => t._id === id);
+      setTasks(tasks.map(t => t._id === id ? task : t));
+      setCompletedCount(prev => task.completed ? prev + 1 : prev - 1);
       setError('Failed to update task');
+    } finally {
+      setUpdatingTasks(prev => ({ ...prev, [id]: false }));
     }
   };
 
@@ -298,7 +299,8 @@ const TaskManagement = () => {
               <div className="flex space-x-2">
                 <button
                   onClick={() => toggleComplete(task._id)}
-                  className={`px-3 py-1 rounded text-white ${
+                  disabled={updatingTasks[task._id]}
+                  className={`px-3 py-1 rounded text-white ${updatingTasks[task._id] ? 'opacity-50 cursor-not-allowed ' : ''} ${
                     task.completed 
                       ? 'bg-gray-400 hover:bg-gray-500' 
                       : 'bg-blue-400 hover:bg-blue-500'

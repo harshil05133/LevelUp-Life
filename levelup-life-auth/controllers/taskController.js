@@ -98,8 +98,17 @@ exports.updateTask = async (req, res) => {
         user.streak.lastTaskDate = now;
       }
       // Within the same streak period (before timeout)
-      else {
+      else if (isWithinStreakWindow(user.streak.lastTaskDate)) {
+        // If no tasks completed today, we're starting a new streak period
+        if (user.streak.tasksCompletedToday === 0) {
+          user.streak.count += 1;
+        }
         user.streak.tasksCompletedToday += 1;
+      }
+      // Outside streak window - start new streak
+      else {
+        user.streak.tasksCompletedToday = 1;
+        user.streak.count = 1;
       }
 
       user.streak.lastTaskDate = now;
