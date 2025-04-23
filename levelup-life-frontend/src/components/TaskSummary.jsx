@@ -9,8 +9,8 @@ const TaskSummary = () => {
     const fetchTasks = async () => {
       try {
         const data = await getTasks();
-        setTotal(data.length);
-        setCompleted(data.filter(t => t.completed).length);
+        setTotal(data.tasks.length);
+        setCompleted(data.tasks.filter(t => t.completed).length);
       } catch (err) {
         console.error(err);
       }
