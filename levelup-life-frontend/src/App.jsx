@@ -2,7 +2,7 @@
 // Main application file: sets up routing, authentication context, and the responsive navbar layout.
 
 import React, { useContext, useState } from 'react';
-import { Routes, Route, Outlet, NavLink } from 'react-router-dom';
+import { Routes, Route, Outlet, NavLink, Link } from 'react-router-dom';
 import { FaBars, FaTimes } from 'react-icons/fa'; // Hamburger & close icons
 
 // Import all page components
@@ -49,13 +49,15 @@ function Layout() {
       <nav className="w-full bg-gradient-to-br from-blue-400 via-green-400 to-green-400">
         <div className="relative max-w-screen-xl mx-auto flex items-center justify-between py-2 px-4">
 
-          {/* Logo on the left: clickable to home if desired */}
+          {/* Logo on the left: clickable to home*/}
           <div className="flex-shrink-0">
-            <img
-              src={LevelUpLogo}
-              alt="Level Up Your Life"
-              className="h-8 md:h-10"
-            />
+            <Link to="/">
+              <img
+                src={LevelUpLogo}
+                alt="Level Up Your Life"
+                className="h-8 md:h-10"
+              />
+            </Link>
           </div>
 
           {/* Desktop nav links: hidden on small screens, flex centered on md+ */}
