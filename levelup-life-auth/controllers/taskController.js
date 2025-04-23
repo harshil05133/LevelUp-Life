@@ -16,7 +16,8 @@ const isNewStreakPeriod = (lastTaskDate) => {
   if (!lastTaskDate) return true;
   const now = new Date();
   const timeSinceLastTask = (now - new Date(lastTaskDate)) / 1000;
-  return timeSinceLastTask > streakTimeout && timeSinceLastTask <= streakWindow;
+  // A new streak period starts when we're past the timeout but still within the window
+  return timeSinceLastTask > streakTimeout;
 };
 
 exports.getTasks = async (req, res) => {
@@ -82,21 +83,23 @@ exports.updateTask = async (req, res) => {
         user.streak.count = 1;
         user.streak.lastTaskDate = now;
       }
-      // Within streak window but in a new streak period
+      // Check if we're in a new streak period (past timeout)
       else if (isNewStreakPeriod(user.streak.lastTaskDate)) {
-        user.streak.tasksCompletedToday = 1;
-        user.streak.count += 1;
+        // If still within streak window, increment streak
+        if (isWithinStreakWindow(user.streak.lastTaskDate)) {
+          user.streak.tasksCompletedToday = 1;
+          user.streak.count += 1;
+        } 
+        // Outside streak window - start new streak
+        else {
+          user.streak.tasksCompletedToday = 1;
+          user.streak.count = 1;
+        }
         user.streak.lastTaskDate = now;
       }
-      // Within the same streak period
-      else if (isWithinStreakWindow(user.streak.lastTaskDate)) {
-        user.streak.tasksCompletedToday += 1;
-      }
-      // Outside streak window - start new streak
+      // Within the same streak period (before timeout)
       else {
-        user.streak.tasksCompletedToday = 1;
-        user.streak.count = 1;
-        user.streak.lastTaskDate = now;
+        user.streak.tasksCompletedToday += 1;
       }
 
       user.streak.lastTaskDate = now;
@@ -108,11 +111,13 @@ exports.updateTask = async (req, res) => {
     } else if (!req.body.completed) {
       const user = await User.findById(req.user);
       
-      if (user.streak.tasksCompletedToday > 0) {
+      // Only modify streak if we're within the streak window (same day)
+      if (isWithinStreakWindow(user.streak.lastTaskDate) && user.streak.tasksCompletedToday > 0) {
         user.streak.tasksCompletedToday -= 1;
         
-        if (user.streak.tasksCompletedToday === 0) {
-          user.streak.count = Math.max(0, user.streak.count - 1);
+        // Only decrease streak if all tasks for today are undone
+        if (user.streak.tasksCompletedToday === 0 && user.streak.count > 0) {
+          user.streak.count -= 1;
         }
         
         await user.save();
