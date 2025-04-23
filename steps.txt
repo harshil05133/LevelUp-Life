@@ -45,7 +45,9 @@ To start the backend:
 To start the frontend:
   - cd into the frontend folder (cd levelup-life-frontend)
   - run npm run dev
-  - available at http://localhost:5173 
+  - available at http://localhost:5173
+
+(Make sure to do npm install dayjs and npm install react-icons)
 
 If powershell is giving security problems, try pasting this then starting back/front end:
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
