@@ -104,13 +104,14 @@ const TaskManagement = () => {
       setTasks(tasks.map(t => t._id === id ? response.task : t));
       setStreak(response.streak);
       
-      // Update completed count
-      if (!task.completed) {
-        const xpResponse = await updateUserXP({ xpAmount: task.points });
-        setTotalXP(xpResponse.totalXP);
-        setLevel(xpResponse.level);
-        setXpToNextLevel(xpResponse.xpToNextLevel);
-      }
+      // Update XP based on the task's previous completion status
+      // If task was completed (now being undone), remove points
+      // If task was not completed (now being completed), add points
+      const xpAmount = !task.completed ? task.points : -task.points;
+      const xpResponse = await updateUserXP({ xpAmount });
+      setTotalXP(xpResponse.totalXP);
+      setLevel(xpResponse.level);
+      setXpToNextLevel(xpResponse.xpToNextLevel);
     } catch (err) {
       const task = tasks.find(t => t._id === id);
       setTasks(tasks.map(t => t._id === id ? task : t));
